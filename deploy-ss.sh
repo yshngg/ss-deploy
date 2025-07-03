@@ -103,8 +103,7 @@ sudo docker run -d \
   -p "${ADDRESS}:${PORT}:${PORT}/tcp" \
   -p "${ADDRESS}:${PORT}:${PORT}/udp" \
   -v "${CONFIG_FILE}:/etc/shadowsocks-rust/config.json:ro" \
-  "$IMAGE" \
-  --config /etc/shadowsocks-rust/config.json
+  "$IMAGE"
 
 # 5. Generate ss:// link
 ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
