@@ -93,7 +93,14 @@ cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 }
 EOF
 
-# 4. Run Docker container
+# 4. Deploy nginx
+sudo docker run -d \
+  --name nginx-check \
+  --restart unless-stopped \
+  -p 80:80 \
+  nginx:alpine sh -c 'echo "Hello, world!" > /usr/share/nginx/html/index.html && exec nginx -g "daemon off;"'
+
+# 5. Run Docker container
 echo "🐳 Starting Shadowsocks container..."
 sudo docker pull "$IMAGE"
 sudo docker rm -f ss-rust &>/dev/null || true
@@ -105,7 +112,7 @@ sudo docker run -d \
   -v "${CONFIG_FILE}:/etc/shadowsocks-rust/config.json:ro" \
   "$IMAGE"
 
-# 5. Generate ss:// link
+# 6. Generate ss:// link
 ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
 SS_URI="ss://${ENCODED_CREDENTIALS}@${ADDRESS}:${PORT}"
 
@@ -114,7 +121,7 @@ if [[ -n "$PLUGIN" ]]; then
   SS_URI="${SS_URI}${PLUGIN_ENCODED}"
 fi
 
-# 6. Display final info
+# 7. Display final info
 echo
 echo "✅ Shadowsocks-Rust deployed successfully!"
 echo "-----------------------------------------"
@@ -125,7 +132,7 @@ echo "🔑 Password:     ${PASSWORD}"
 echo "📄 Config file:  ${CONFIG_FILE}"
 echo "🔗 SS URI:       ${SS_URI}"
 
-# 7. Optional QR code
+# 8. Optional QR code
 if command -v qrencode &>/dev/null; then
   echo
   echo "📱 QR Code (scan in Shadowsocks client):"
