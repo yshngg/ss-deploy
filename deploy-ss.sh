@@ -93,7 +93,7 @@ cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 }
 EOF
 
-# 4. Deploy nginx
+# 4. Deploy nginx for health check
 sudo docker run -d \
   --name nginx-check \
   --restart unless-stopped \
