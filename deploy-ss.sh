@@ -7,10 +7,10 @@ trap 'echo "❌ Error on line ${LINENO}, exit code $?" >&2' ERR
 
 # Default configuration values
 PORT="${SS_PORT:-8388}"
-METHOD="${SS_METHOD:-aes-256-gcm}"
+METHOD="${SS_METHOD:-chacha20-ietf-poly1305}"
 ADDRESS="${SS_LISTEN_ADDR:-0.0.0.0}"
-PLUGIN="${SS_PLUGIN:-}"
-PLUGIN_OPTS="${SS_PLUGIN_OPTS:-}"
+PLUGIN="${SS_PLUGIN:-v2ray-plugin}"
+PLUGIN_OPTS="${SS_PLUGIN_OPTS:-server}"
 IMAGE="${SS_IMAGE:-ghcr.io/shadowsocks/ssserver-rust:latest}"
 CONFIG_DIR="/etc/shadowsocks-rust"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
@@ -24,8 +24,8 @@ Options:
   -p PORT         Shadowsocks port (default: $PORT)
   -m METHOD       Encryption method (default: $METHOD)
   -a ADDRESS      Listen address (default: $ADDRESS)
-  -P PLUGIN       Plugin name (e.g., v2ray-plugin)
-  -o PLUGIN_OPTS  Plugin options (e.g., "server;tls")
+  -P PLUGIN       Plugin name (default: $PLUGIN)
+  -o PLUGIN_OPTS  Plugin options (default: $PLUGIN_OPTS)
   -h              Show this help message
 EOF
   exit 0
