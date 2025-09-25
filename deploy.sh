@@ -11,9 +11,10 @@ METHOD="${SS_METHOD:-chacha20-ietf-poly1305}"
 ADDRESS="${SS_LISTEN_ADDR:-0.0.0.0}"
 PLUGIN="${SS_PLUGIN:-v2ray-plugin}"
 PLUGIN_OPTS="${SS_PLUGIN_OPTS:-server}"
-IMAGE="${SS_IMAGE:-ghcr.io/shadowsocks/ssserver-rust:latest}"
+VERSION="${SS_VERSION:-latest}"
 CONFIG_DIR="/etc/shadowsocks-rust"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
+BIN_DIR="/usr/local/bin"
 
 # Help message
 usage() {
@@ -46,44 +47,44 @@ done
 
 echo "🚀 Starting Shadowsocks-Rust deployment..."
 
-# 1. Install Docker if not installed
-if ! command -v docker &>/dev/null; then
-  echo "🛠 Docker not found. Installing..."
-  if [ -f /etc/redhat-release ]; then
-    sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    sudo yum install -y docker-ce docker-ce-cli containerd.io
-  elif [ -f /etc/debian_version ]; then
-    sudo apt-get update
-    sudo apt-get install -y ca-certificates curl gnupg lsb-release
-    curl -fsSL https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")/gpg | \
-      sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-      https://download.docker.com/linux/$(. /etc/os-release && echo "$ID") \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
-  else
-    echo "❌ Unsupported Linux distribution."
+# 1. Detect architecture (amd64 / arm64 only)
+ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
+  aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
+  *)
+    echo "❌ Unsupported architecture: $ARCH"
     exit 1
-  fi
-  sudo systemctl enable docker
-  sudo systemctl start docker
-  echo "✅ Docker installed."
-else
-  echo "✔ Docker is already installed."
+    ;;
+esac
+
+# 2. Get latest version if VERSION=latest
+if [[ "$VERSION" == "latest" ]]; then
+  VERSION="$(curl -fsSL https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases/latest \
+    | grep -Po '"tag_name": "\K.*?(?=")')"
+  echo "⬇️ Latest version detected: $VERSION"
 fi
 
-# 2. Generate secure random password
-PASSWORD="$(openssl rand -base64 16)"
-echo "🔑 Generated secure password."
+# 3. Download and install shadowsocks-rust
+echo "📦 Downloading Shadowsocks-Rust $VERSION ($TARGET)..."
+URL="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${VERSION}/shadowsocks-${VERSION}.${TARGET}.tar.xz"
+TMP_DIR="$(mktemp -d)"
+curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
+tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
+sudo install -m 755 "$TMP_DIR/ssserver" "$TMP_DIR/ssservice" "$BIN_DIR/"
+rm -rf "$TMP_DIR"
+echo "✅ Installed ssserver and ssservice to $BIN_DIR"
 
-# 3. Create config directory and file
+# Generate secure password using ssservice
+PASSWORD="$(ssservice genkey -m "$METHOD")"
+echo "🔑 Generated password with ssservice."
+
+# 4. Create config
 echo "📁 Creating config..."
 sudo mkdir -p "$CONFIG_DIR"
 cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 {
-  "server": "0.0.0.0",
+  "server": "${ADDRESS}",
   "server_port": ${PORT},
   "password": "${PASSWORD}",
   "method": "${METHOD}",
@@ -93,24 +94,12 @@ cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 }
 EOF
 
-# 4. Deploy nginx for health check
-sudo docker run -d \
-  --name nginx-check \
-  --restart unless-stopped \
-  -p 80:80 \
-  nginx:alpine sh -c 'echo "Hello, world!" > /usr/share/nginx/html/index.html && exec nginx -g "daemon off;"'
-
-# 5. Run Docker container
-echo "🐳 Starting Shadowsocks container..."
-sudo docker pull "$IMAGE"
-sudo docker rm -f ss-rust &>/dev/null || true
-sudo docker run -d \
-  --name ss-rust \
-  --restart unless-stopped \
-  -p "${ADDRESS}:${PORT}:${PORT}/tcp" \
-  -p "${ADDRESS}:${PORT}:${PORT}/udp" \
-  -v "${CONFIG_FILE}:/etc/shadowsocks-rust/config.json:ro" \
-  "$IMAGE"
+# 5. Run ssserver
+mv ./ssserver.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl start ss-rust.service
+sudo systemctl enable ssserver.service
+sudo systemctl status ss-rust.service
 
 # 6. Generate ss:// link
 ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
@@ -121,7 +110,7 @@ if [[ -n "$PLUGIN" ]]; then
   SS_URI="${SS_URI}${PLUGIN_ENCODED}"
 fi
 
-# 7. Display final info
+# 7. Final output
 echo
 echo "✅ Shadowsocks-Rust deployed successfully!"
 echo "-----------------------------------------"
