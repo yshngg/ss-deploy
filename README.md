@@ -19,7 +19,7 @@ It supports major Linux distributions including Ubuntu, Debian, CentOS, and more
 Download and run the script in one line:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy_ss.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | sudo bash
 ```
 
 Once completed, you can:
@@ -38,13 +38,13 @@ SS_PORT=443 \
 SS_METHOD=chacha20-ietf-poly1305 \
 SS_PLUGIN=v2ray-plugin \
 SS_PLUGIN_OPTS="server;tls" \
-sudo bash deploy_ss.sh
+sudo bash deploy.sh
 ```
 
 ### CLI arguments
 
 ```bash
-sudo bash deploy_ss.sh \
+sudo bash deploy.sh \
   -p 443 \
   -m chacha20-ietf-poly1305 \
   -P v2ray-plugin \
