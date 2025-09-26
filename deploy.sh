@@ -47,7 +47,16 @@ done
 
 echo "🚀 Starting Shadowsocks-Rust deployment..."
 
-# 1. Detect architecture (amd64 / arm64 only)
+# 1. Setting up HTTP Server
+echo "📡 Setting up HTTP Server for checking network connectivity..."
+sudo install -m 644 "$SCRIPT_DIR/http.service" /etc/systemd/system/http.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now http.service
+# Show status but don't fail if inactive
+sudo systemctl --no-pager --full status http.service || true
+
+# 2. Download and install shadowsocks-rust
+# Detect architecture (amd64 / arm64 only)
 ARCH="$(uname -m)"
 case "$ARCH" in
   x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
@@ -58,14 +67,14 @@ case "$ARCH" in
     ;;
 esac
 
-# 2. Get latest version if VERSION=latest
+# Get latest version if VERSION=latest
 if [[ "$VERSION" == "latest" ]]; then
   VERSION="$(curl -fsSL https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases/latest \
     | grep -Po '"tag_name": "\K.*?(?=")')"
   echo "⬇️ Latest version detected: $VERSION"
 fi
 
-# 3. Download and install shadowsocks-rust
+# Download and install
 echo "📦 Downloading Shadowsocks-Rust $VERSION ($TARGET)..."
 URL="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${VERSION}/shadowsocks-${VERSION}.${TARGET}.tar.xz"
 TMP_DIR="$(mktemp -d)"
@@ -79,11 +88,11 @@ tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
 sudo install -m 755 "$TMP_DIR/$EXTRACT_DIR/ssserver" "$TMP_DIR/$EXTRACT_DIR/ssservice" "$BIN_DIR/"  
 echo "✅ Installed ssserver and ssservice to $BIN_DIR"
 
+# 3. Create config
 # Generate secure password using ssservice
 PASSWORD="$(ssservice genkey -m "$METHOD")"
 echo "🔑 Generated password with ssservice."
 
-# 4. Create config
 echo "📁 Creating config..."
 sudo mkdir -p "$CONFIG_DIR"
 cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
@@ -98,16 +107,17 @@ cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 }
 EOF
 
-# 5. Run ssserver
+# 4. Run ssserver
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 sudo install -m 644 "$SCRIPT_DIR/ssserver.service" /etc/systemd/system/ssserver.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now ssserver.service
 sudo systemctl status ss-rust.service
 # Optional: show brief status without paging, do not fail the script if inactive
-sudo systemctl --no-pager --full status ssserver.service || true 
+sudo systemctl --no-pager --full status ssserver.service || true
 
-# 6. Generate ss:// link
+# 5. Final output
+# Generate ss:// link
 ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
 SS_URI="ss://${ENCODED_CREDENTIALS}@${ADDRESS}:${PORT}"
 
@@ -116,7 +126,7 @@ if [[ -n "$PLUGIN" ]]; then
   SS_URI="${SS_URI}${PLUGIN_ENCODED}"
 fi
 
-# 7. Final output
+# Output
 echo
 echo "✅ Shadowsocks-Rust deployed successfully!"
 echo "-----------------------------------------"
@@ -127,7 +137,7 @@ echo "🔑 Password:     ${PASSWORD}"
 echo "📄 Config file:  ${CONFIG_FILE}"
 echo "🔗 SS URI:       ${SS_URI}"
 
-# 8. Optional QR code
+# 6. Optional QR code
 if command -v qrencode &>/dev/null; then
   echo
   echo "📱 QR Code (scan in Shadowsocks client):"
