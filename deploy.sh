@@ -9,8 +9,8 @@ trap 'echo "❌ Error on line ${LINENO}, exit code $?" >&2' ERR
 PORT="${SS_PORT:-8388}"
 METHOD="${SS_METHOD:-chacha20-ietf-poly1305}"
 ADDRESS="${SS_LISTEN_ADDR:-0.0.0.0}"
-PLUGIN="${SS_PLUGIN:-v2ray-plugin}"
-PLUGIN_OPTS="${SS_PLUGIN_OPTS:-server}"
+PLUGIN="${SS_PLUGIN:-}"
+PLUGIN_OPTS="${SS_PLUGIN_OPTS:-}"
 VERSION="${SS_VERSION:-latest}"
 CONFIG_DIR="/etc/shadowsocks-rust"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
@@ -69,10 +69,14 @@ fi
 echo "📦 Downloading Shadowsocks-Rust $VERSION ($TARGET)..."
 URL="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${VERSION}/shadowsocks-${VERSION}.${TARGET}.tar.xz"
 TMP_DIR="$(mktemp -d)"
+cleanup() { rm -rf "$TMP_DIR"; }
+trap 'echo "❌ Error on line ${LINENO}, exit code $?"; cleanup' ERR  
+trap 'cleanup' EXIT
 curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
+# Determine top-level dir inside the tarball
+EXTRACT_DIR="$(tar -tf "$TMP_DIR/ss-rust.tar.xz" | head -1 | cut -d/ -f1)"
 tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
-sudo install -m 755 "$TMP_DIR/ssserver" "$TMP_DIR/ssservice" "$BIN_DIR/"
-rm -rf "$TMP_DIR"
+sudo install -m 755 "$TMP_DIR/$EXTRACT_DIR/ssserver" "$TMP_DIR/$EXTRACT_DIR/ssservice" "$BIN_DIR/"  
 echo "✅ Installed ssserver and ssservice to $BIN_DIR"
 
 # Generate secure password using ssservice
@@ -95,11 +99,13 @@ cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 EOF
 
 # 5. Run ssserver
-mv ./ssserver.service /etc/systemd/system/
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+sudo install -m 644 "$SCRIPT_DIR/ssserver.service" /etc/systemd/system/ssserver.service
 sudo systemctl daemon-reload
-sudo systemctl start ss-rust.service
-sudo systemctl enable ssserver.service
+sudo systemctl enable --now ssserver.service
 sudo systemctl status ss-rust.service
+# Optional: show brief status without paging, do not fail the script if inactive
+sudo systemctl --no-pager --full status ssserver.service || true 
 
 # 6. Generate ss:// link
 ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
