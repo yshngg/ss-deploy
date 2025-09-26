@@ -210,7 +210,7 @@ ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
 SS_URI="ss://${ENCODED_CREDENTIALS}@${ADDRESS}:${PORT}"
 
 if [[ -n "$PLUGIN" ]]; then
-    PLUGIN_ENCODED=$(echo -n "?plugin=${PLUGIN}${PLUGIN_OPTS:+%3B${PLUGIN_OPTS//;/\\%3B}}" | tr -d '\n')
+    PLUGIN_ENCODED=$(echo -n "/?plugin=${PLUGIN}${PLUGIN_OPTS:+%3B${PLUGIN_OPTS//;/\\%3B}}" | tr -d '\n')
     SS_URI="${SS_URI}${PLUGIN_ENCODED}"
 fi
 
