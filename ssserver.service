@@ -1,0 +1,93 @@
+# Optimized systemd unit for shadowsocks-rust with explanatory comments.
+# Notes:
+# - Recommended: create a dedicated system group and user "shadowsocks" before enabling this unit:  
+#     sudo groupadd --system shadowsocks || true  
+#     sudo useradd --system --no-create-home --shell /usr/sbin/nologin --gid shadowsocks shadowsocks  
+#   Or change User/Group to "nobody" and use a non-privileged port (>=1024).  
+[Unit]
+Description=Shadowsocks-Rust Server
+Documentation=https://github.com/shadowsocks/shadowsocks-rust
+After=network.target
+Wants=network-online.target
+
+# Protect against rapid restart loops at the unit level
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+# The server runs as a simple long-running process.
+Type=simple
+
+# --- Identity and runtime directory ---
+# Use a dedicated, unprivileged user and group for improved isolation.
+# Create the user/group beforehand or change to "nobody" if you must.
+User=shadowsocks
+Group=shadowsocks
+
+# Let systemd create /run/shadowsocks-rust and set ownership to User/Group.
+RuntimeDirectory=shadowsocks-rust
+RuntimeDirectoryMode=0750
+
+# Environment file (optional) to override settings like PORT or config path without editing the unit.
+# You can create /etc/default/shadowsocks-rust or /etc/sysconfig/shadowsocks-rust depending on distro.
+# EnvironmentFile=-/etc/default/shadowsocks-rust
+
+# --- Startup/command ---
+# Pre-check: ensure config file exists (fail early if missing).
+ExecStartPre=/usr/bin/test -f /etc/shadowsocks-rust/config.json
+
+# Main process: path to the shadowsocks-rust binary and config file.
+ExecStart=/usr/local/bin/ssserver -c /etc/shadowsocks-rust/config.json
+
+# Graceful stop: give the process some time to terminate before force-killing.
+TimeoutStopSec=20
+
+# If the service crashes, attempt automatic restart; avoid infinite busy restart loops because of StartLimit above.
+Restart=on-failure
+RestartSec=5s
+
+# Ensure all processes in the control group are killed on stop/restart.
+KillMode=control-group
+
+# --- Logging ---
+# Send stdout/stderr to the journal.
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=shadowsocks-rust
+
+# --- Resource limits & capabilities ---
+# Raise file descriptor limit if the server needs to handle many connections.
+LimitNOFILE=65536
+
+# Allow binding to privileged ports (like 80) while running as an unprivileged user.
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# --- Security hardening ---
+# Do not allow gaining new privileges.
+NoNewPrivileges=true
+
+# Restrict filesystem access: system files are read-only except explicitly writable paths.
+ProtectSystem=full        # make /usr and /boot read-only (but allow /etc and /var)
+ProtectHome=true         # make /home, /root, /run/user inaccessible
+ReadOnlyPaths=/usr/local/bin
+ReadWritePaths=/var/run/shadowsocks-rust /etc/shadowsocks-rust
+
+# Provide a private /tmp to the service
+PrivateTmp=true
+
+# Disallow access to raw devices
+PrivateDevices=true
+
+# Prevent mmap() from creating writable+executable mappings
+MemoryDenyWriteExecute=true
+
+# Restrict the socket families to IPv4/IPv6 only
+# (uncomment if systemd version supports it)
+# RestrictAddressFamilies=AF_INET AF_INET6
+
+# Optionally restrict syscalls (commented out by default; enable carefully)
+# SystemCallFilter=@default
+
+[Install]
+WantedBy=multi-user.target
