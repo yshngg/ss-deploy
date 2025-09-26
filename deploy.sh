@@ -53,7 +53,7 @@ sudo id -u shadowsocks >/dev/null 2>&1 || sudo useradd --system --no-create-home
 
 # 1. Setting up HTTP Server
 echo "📡 Setting up HTTP Server for checking network connectivity..."
-cat <<EOF > http.service
+cat <<'EOF' > "$SCRIPT_DIR/http.service"
 [Unit]
 Description=Minimal HTTP server (netcat, inline command)
 Documentation=man:nc(1)
@@ -144,7 +144,7 @@ echo "🔑 Generated password with ssservice."
 
 echo "📁 Creating config..."
 sudo mkdir -p "$CONFIG_DIR"
-cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
+cat <<'EOF' | sudo tee "$CONFIG_FILE" >/dev/null
 {
   "server": "${ADDRESS}",
   "server_port": ${PORT},
@@ -158,7 +158,7 @@ EOF
 
 # 4. Run ssserver
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cat <<EOF > http.service
+cat <<EOF > $SCRIPT_DIR/ssserver.service
 [Unit]
 Description=Shadowsocks-Rust Server
 Documentation=https://github.com/shadowsocks/shadowsocks-rust
