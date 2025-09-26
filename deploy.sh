@@ -29,20 +29,20 @@ Options:
   -o PLUGIN_OPTS  Plugin options (default: $PLUGIN_OPTS)
   -h              Show this help message
 EOF
-  exit 0
+    exit 0
 }
 
 # Parse CLI options
 while getopts "p:m:a:P:o:h" opt; do
-  case $opt in
-    p) PORT="$OPTARG" ;;
-    m) METHOD="$OPTARG" ;;
-    a) ADDRESS="$OPTARG" ;;
-    P) PLUGIN="$OPTARG" ;;
-    o) PLUGIN_OPTS="$OPTARG" ;;
-    h) usage ;;
-    *) usage ;;
-  esac
+    case $opt in
+        p) PORT="$OPTARG" ;;
+        m) METHOD="$OPTARG" ;;
+        a) ADDRESS="$OPTARG" ;;
+        P) PLUGIN="$OPTARG" ;;
+        o) PLUGIN_OPTS="$OPTARG" ;;
+        h) usage ;;
+        *) usage ;;
+    esac
 done
 
 echo "🚀 Starting Shadowsocks-Rust deployment..."
@@ -63,19 +63,19 @@ sudo systemctl --no-pager --full status http.service || true
 # Detect architecture (amd64 / arm64 only)
 ARCH="$(uname -m)"
 case "$ARCH" in
-  x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
-  aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
-  *)
-    echo "❌ Unsupported architecture: $ARCH"
-    exit 1
+    x86_64) TARGET="x86_64-unknown-linux-gnu" ;;
+    aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
+    *)
+        echo "❌ Unsupported architecture: $ARCH"
+        exit 1
     ;;
 esac
 
 # Get latest version if VERSION=latest
 if [[ "$VERSION" == "latest" ]]; then
-  VERSION="$(curl -fsSL https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases/latest \
+    VERSION="$(curl -fsSL https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases/latest \
     | grep -Po '"tag_name": "\K.*?(?=")')"
-  echo "⬇️ Latest version detected: $VERSION"
+    echo "⬇️ Latest version detected: $VERSION"
 fi
 
 # Download and install
@@ -83,13 +83,17 @@ echo "📦 Downloading Shadowsocks-Rust $VERSION ($TARGET)..."
 URL="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${VERSION}/shadowsocks-${VERSION}.${TARGET}.tar.xz"
 TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
-trap 'echo "❌ Error on line ${LINENO}, exit code $?"; cleanup' ERR  
+trap 'echo "❌ Error on line ${LINENO}, exit code $?"; cleanup' ERR
 trap 'cleanup' EXIT
 curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
 # Determine top-level dir inside the tarball
 EXTRACT_DIR="$(tar -tf "$TMP_DIR/ss-rust.tar.xz" | head -1 | cut -d/ -f1)"
 tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
-sudo install -m 755 "$TMP_DIR/$EXTRACT_DIR/ssserver" "$TMP_DIR/$EXTRACT_DIR/ssservice" "$BIN_DIR/"  
+if [[ ! -x "$TMP_DIR/$EXTRACT_DIR/ssserver" || ! -x "$TMP_DIR/$EXTRACT_DIR/ssservice" ]]; then
+    echo "❌ Expected binaries not found in $TMP_DIR/$EXTRACT_DIR" >&2
+    exit 1
+fi
+sudo install -m 755 "$TMP_DIR/$EXTRACT_DIR/ssserver" "$TMP_DIR/$EXTRACT_DIR/ssservice" "$BIN_DIR/"
 echo "✅ Installed ssserver and ssservice to $BIN_DIR"
 
 # 3. Create config
@@ -126,8 +130,8 @@ ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
 SS_URI="ss://${ENCODED_CREDENTIALS}@${ADDRESS}:${PORT}"
 
 if [[ -n "$PLUGIN" ]]; then
-  PLUGIN_ENCODED=$(echo -n "?plugin=${PLUGIN}${PLUGIN_OPTS:+%3B${PLUGIN_OPTS//;/\\%3B}}" | tr -d '\n')
-  SS_URI="${SS_URI}${PLUGIN_ENCODED}"
+    PLUGIN_ENCODED=$(echo -n "?plugin=${PLUGIN}${PLUGIN_OPTS:+%3B${PLUGIN_OPTS//;/\\%3B}}" | tr -d '\n')
+    SS_URI="${SS_URI}${PLUGIN_ENCODED}"
 fi
 
 # Output
@@ -143,9 +147,9 @@ echo "🔗 SS URI:       ${SS_URI}"
 
 # 6. Optional QR code
 if command -v qrencode &>/dev/null; then
-  echo
-  echo "📱 QR Code (scan in Shadowsocks client):"
-  echo "$SS_URI" | qrencode -t ANSIUTF8
+    echo
+    echo "📱 QR Code (scan in Shadowsocks client):"
+    echo "$SS_URI" | qrencode -t ANSIUTF8
 else
-  echo "⚠️ 'qrencode' not found. Install it to show QR code (e.g., 'sudo apt install qrencode')."
+    echo "⚠️ 'qrencode' not found. Install it to show QR code (e.g., 'sudo apt install qrencode')."
 fi
