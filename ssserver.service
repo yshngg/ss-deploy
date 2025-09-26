@@ -1,8 +1,9 @@
 # Optimized systemd unit for shadowsocks-rust with explanatory comments.
 # Notes:
-# - Recommended to create a dedicated system user/group "shadowsocks" before enabling this unit:
-#     sudo useradd --system --no-create-home --shell /usr/sbin/nologin --group nogroup shadowsocks
-#   Or change User/Group to "nobody" if you prefer (less ideal).
+# - Recommended: create a dedicated system group and user "shadowsocks" before enabling this unit:  
+#     sudo groupadd --system shadowsocks || true  
+#     sudo useradd --system --no-create-home --shell /usr/sbin/nologin --gid shadowsocks shadowsocks  
+#   Or change User/Group to "nobody" and use a non-privileged port (>=1024).  
 [Unit]
 Description=Shadowsocks-Rust Server
 Documentation=https://github.com/shadowsocks/shadowsocks-rust

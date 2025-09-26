@@ -47,6 +47,10 @@ done
 
 echo "🚀 Starting Shadowsocks-Rust deployment..."
 
+# 0. Create shadowsocks user and group if not exist
+sudo getent group shadowsocks >/dev/null || sudo groupadd --system shadowsocks
+sudo id -u shadowsocks >/dev/null 2>&1 || sudo useradd --system --no-create-home --shell /usr/sbin/nologin --gid shadowsocks shadowsocks
+
 # 1. Setting up HTTP Server
 echo "📡 Setting up HTTP Server for checking network connectivity..."
 sudo install -m 644 "$SCRIPT_DIR/http.service" /etc/systemd/system/http.service

@@ -30,7 +30,7 @@ Environment=PORT=80
 
 # Pre-flight checks: fail early if nc binary or bash are missing.
 ExecStartPre=/usr/bin/test -x /bin/bash
-ExecStartPre=/usr/bin/command -v nc
+ExecStartPre=/bin/bash -lc 'command -v nc >/dev/null'
 
 # ExecStart: inline bash loop that:
 #  1) prints an HTTP response (CRLFs required),

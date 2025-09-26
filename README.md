@@ -1,18 +1,18 @@
 # ss-deploy
 
-**ss-deploy** is a simple one-click deployment script for [shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust) using Docker.  
+**ss-deploy** is a simple one-click deployment script for [shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust).  
 It supports major Linux distributions including Ubuntu, Debian, CentOS, and more.
 
 ## 🧩 Features
 
-- 🔐 Secure random password generation
-- 🐳 Automatic Docker installation if missing
+- 🔐 Secure random password generation using ssservice
+- 🚀 Native systemd service installation
 - ⚙️ Customizable via environment variables or CLI arguments
 - 🔌 Plugin support (e.g., `v2ray-plugin`, `simple-obfs`)
-- 🔁 Docker container auto-restarts on reboot
+- 🔁 Automatic service startup on system reboot
 - 📄 Generates Shadowsocks config file
 - 🔗 Outputs `ss://` URI and optional QR code for client import
-- ✅ Deploys a minimal Nginx server on port 80 for health checks
+- ✅ Deploys a minimal HTTP server for connectivity checks
 
 ## 🚀 Quick Start
 
@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | s
 
 Once completed, you can:
 
-- Access `http://<server-ip>` to verify network access (should return `Hello, world!`)
+- Access `http://<server-ip>` to verify network access (should return `pong`)
 - Use the displayed ss:// URI or QR code to configure your Shadowsocks client
 
 ## ⚙️ Custom Options
@@ -56,27 +56,28 @@ sudo bash deploy.sh \
 | Option              | Description                                 | Default         |
 |---------------------|---------------------------------------------|-----------------|
 | `-p`, `SS_PORT`      | Port to listen                              | `8388`          |
-| `-m`, `SS_METHOD`    | Encryption method                           | `aes-256-gcm`   |
+| `-m`, `SS_METHOD`    | Encryption method                           | `chacha20-ietf-poly1305` |
 | `-a`, `SS_LISTEN_ADDR` | Listen address                            | `0.0.0.0`       |
 | `-P`, `SS_PLUGIN`    | Plugin name (e.g., `v2ray-plugin`)          | *(empty)*       |
 | `-o`, `SS_PLUGIN_OPTS`| Plugin options (e.g., `server;tls`)        | *(empty)*       |
 
-## ✅ Health Check (Nginx)
+## ✅ Health Check
 
-After running the script, a lightweight Nginx server will be deployed and listen on port 80.
+The script installs a lightweight HTTP server (using netcat) that listens on port 80.
 
 You can verify that your server is accessible from the public internet:
 
 ```bash
 curl http://<server-ip>
 # should return:
-# Hello, world!
+# pong
 ```
 
-This is useful for basic firewall/NAT/port forwarding diagnosis.
+This helps diagnose network connectivity, firewall rules, and NAT/port forwarding.
 
 ## 📦 Requirements
 
-- Linux (Ubuntu, Debian, CentOS, etc.)
-- `curl`, `openssl`, `docker` (auto-installed if missing)
+- Linux with systemd (Ubuntu, Debian, CentOS, etc.)
+- `curl` for downloading files
+- `nc` (netcat) for the health check server
 - qrencode (optional, for displaying QR codes)
