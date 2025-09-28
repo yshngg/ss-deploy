@@ -15,6 +15,7 @@ VERSION="${SS_VERSION:-latest}"
 CONFIG_DIR="/etc/shadowsocks-rust"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 BIN_DIR="/usr/local/bin"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Help message
 usage() {
@@ -156,7 +157,6 @@ cat <<'EOF' | sudo tee "$CONFIG_FILE" >/dev/null
 EOF
 
 # 4. Run ssserver
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cat <<EOF > $SCRIPT_DIR/ssserver.service
 [Unit]
 Description=Shadowsocks-Rust Server
