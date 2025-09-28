@@ -124,7 +124,6 @@ echo "📦 Downloading Shadowsocks-Rust $VERSION ($TARGET)..."
 URL="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${VERSION}/shadowsocks-${VERSION}.${TARGET}.tar.xz"
 TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
-trap 'echo "❌ Error on line ${LINENO}, exit code $?"; cleanup' ERR
 trap 'cleanup' EXIT
 curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
 # Determine top-level dir inside the tarball
