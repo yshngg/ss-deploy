@@ -71,9 +71,7 @@ ExecStartPre=/bin/bash -lc 'command -v nc >/dev/null'
 ExecStart=/bin/bash -c '\
   while true; do \
     printf "%b" "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\nHello World!" \
-      | nc -l -p "$PORT" || \
-    printf "%b" "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\nHello World!" \
-      | nc -l "$PORT" ; \
+      | nc -l -p "$PORT"; \
   done'
 Restart=on-failure        # restart only on non-zero exit (avoid tight always-restart loops)
 RestartSec=5s
