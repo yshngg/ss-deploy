@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | s
 
 Once completed, you can:
 
-- Access `http://<server-ip>` to verify network access (should return `pong`)
+- Access `http://<server-ip>` to verify network access (should return `Hello World!`)
 - Use the displayed ss:// URI or QR code to configure your Shadowsocks client
 
 ## ⚙️ Custom Options
