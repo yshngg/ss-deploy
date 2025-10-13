@@ -143,7 +143,7 @@ echo "🔑 Generated password with ssservice."
 
 echo "📁 Creating config..."
 sudo mkdir -p "$CONFIG_DIR"
-cat <<'EOF' | sudo tee "$CONFIG_FILE" >/dev/null
+cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 {
   "server": "${ADDRESS}",
   "server_port": ${PORT},
@@ -156,7 +156,7 @@ cat <<'EOF' | sudo tee "$CONFIG_FILE" >/dev/null
 EOF
 
 # 4. Run ssserver
-cat <<EOF > $SCRIPT_DIR/ssserver.service
+cat <<'EOF' > $SCRIPT_DIR/ssserver.service
 [Unit]
 Description=Shadowsocks-Rust Server
 Documentation=https://github.com/shadowsocks/shadowsocks-rust
