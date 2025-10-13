@@ -198,7 +198,7 @@ EOF
 sudo install -m 644 "$SCRIPT_DIR/ssserver.service" /etc/systemd/system/ssserver.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now ssserver.service
-sudo systemctl status ss-rust.service
+sudo systemctl status ssserver.service
 # Optional: show brief status without paging, do not fail the script if inactive
 sudo systemctl --no-pager --full status ssserver.service || true
 
