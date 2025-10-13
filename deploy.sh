@@ -127,8 +127,8 @@ TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
 trap 'cleanup' EXIT
 curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
-# Determine top-level dir inside the tarball
-EXTRACT_DIR="$(tar -tf "$TMP_DIR/ss-rust.tar.xz" | head -1 | cut -d/ -f1)"
+
+EXTRACT_DIR=ss-rust
 tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
 if [[ ! -x "$TMP_DIR/$EXTRACT_DIR/ssserver" || ! -x "$TMP_DIR/$EXTRACT_DIR/ssservice" ]]; then
     echo "❌ Expected binaries not found in $TMP_DIR/$EXTRACT_DIR" >&2
