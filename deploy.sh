@@ -128,13 +128,12 @@ cleanup() { rm -rf "$TMP_DIR"; }
 trap 'cleanup' EXIT
 curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
 
-EXTRACT_DIR=ss-rust
-tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR/$EXTRACT_DIR"
-if [[ ! -x "$TMP_DIR/$EXTRACT_DIR/ssserver" || ! -x "$TMP_DIR/$EXTRACT_DIR/ssservice" ]]; then
-    echo "❌ Expected binaries not found in $TMP_DIR/$EXTRACT_DIR" >&2
+tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
+if [[ ! -x "$TMP_DIR/ssserver" || ! -x "$TMP_DIR/ssservice" ]]; then
+    echo "❌ Expected binaries not found in $TMP_DIR/" >&2
     exit 1
 fi
-sudo install -m 755 "$TMP_DIR/$EXTRACT_DIR/ssserver" "$TMP_DIR/$EXTRACT_DIR/ssservice" "$BIN_DIR/"
+sudo install -m 755 "$TMP_DIR/ssserver" "$TMP_DIR/ssservice" "$BIN_DIR/"
 echo "✅ Installed ssserver and ssservice to $BIN_DIR"
 
 # 3. Create config
