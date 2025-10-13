@@ -79,5 +79,5 @@ This helps diagnose network connectivity, firewall rules, and NAT/port forwardin
 
 - Linux with systemd (Ubuntu, Debian, CentOS, etc.)
 - `curl` for downloading files
-- `nc` (netcat) for the health check server
+- `nc` (ncat) for the health check server
 - qrencode (optional, for displaying QR codes)
