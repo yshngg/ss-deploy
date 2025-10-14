@@ -66,7 +66,7 @@ sudo bash deploy.sh \
 
 ## ✅ Health Check
 
-The script installs a lightweight HTTP server (using netcat) that listens on port 80.
+The script installs a lightweight HTTP server (using ncat) that listens on port 80.
 
 You can verify that your server is accessible from the public internet:
 
