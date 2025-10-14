@@ -16,7 +16,7 @@ It supports major Linux distributions including Ubuntu, Debian, CentOS, and more
 
 ## 🚀 Quick Start
 
-### Install `nc` ([ncat](https://nmap.org/ncat/)):
+### Prerequisite - install `nc` ([ncat](https://nmap.org/ncat/)):
 
 > Ncat is integrated with Nmap.
 
