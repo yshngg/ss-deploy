@@ -77,7 +77,7 @@ sudo bash deploy.sh \
 
 The script installs a lightweight HTTP server (using `ncat`) that listens on port `80`.
 
-You can check if server is reachable from the local machine:
+You can check if the server is reachable from the local machine:
 
 ```bash
 curl http://<server-ip>
