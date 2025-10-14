@@ -203,7 +203,11 @@ sudo systemctl --no-pager --full status ssserver.service || true
 # 5. Final output
 # Generate ss:// link
 ENCODED_CREDENTIALS=$(echo -n "${METHOD}:${PASSWORD}" | base64 -w 0)
-SS_URI="ss://${ENCODED_CREDENTIALS}@$(curl -fsSL ifconfig.me):${PORT}"
+if ! PUBLIC_IP="$(curl -fsSL --max-time 5 ifconfig.me)"; then
+  echo "⚠️ Unable to determine public IP from ifconfig.me, falling back to ${ADDRESS}." >&2
+  PUBLIC_IP="${ADDRESS}"
+fi
+SS_URI="ss://${ENCODED_CREDENTIALS}@${PUBLIC_IP}:${PORT}"
 
 if [[ -n "$PLUGIN" ]]; then
     PLUGIN_ENCODED=$(echo -n "/?plugin=${PLUGIN}${PLUGIN_OPTS:+%3B${PLUGIN_OPTS//;/\\%3B}}" | tr -d '\n')
