@@ -22,6 +22,9 @@ Download and run the script in one line:
 curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | sudo bash
 ```
 
+> [!IMPORTANT]
+> Add inbound rules in your security group to allow ports `80` and `8388` (or the port specified by the `-p` flag or the `SS_PORT` environment variable).
+
 Once completed, you can:
 
 - Access `http://<server-ip>` to verify network access (should return `Hello World!`)
