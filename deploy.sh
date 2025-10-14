@@ -17,6 +17,11 @@ CONFIG_FILE="${CONFIG_DIR}/config.json"
 BIN_DIR="/usr/local/bin"
 SCRIPT_DIR="$(pwd)"
 
+# Fix "command not found" error on certain Linux distributions (e.g., Red Hat)
+# https://superuser.com/a/709522
+# https://man7.org/linux/man-pages/man5/sudoers.5.html
+export PATH="$PATH:/usr/local/bin"
+
 # Help message
 usage() {
   cat <<EOF
