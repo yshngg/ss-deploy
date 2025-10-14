@@ -16,7 +16,7 @@ It supports major Linux distributions including Ubuntu, Debian, CentOS, and more
 
 ## 🚀 Quick Start
 
-### Prerequisite - install `nc` ([ncat](https://nmap.org/ncat/)) if it does not exist on your system:
+### Prerequisite - install `nc` ([ncat](https://nmap.org/ncat/)) if it does not exist on the system:
 
 > Ncat is integrated with Nmap.
 
@@ -32,12 +32,12 @@ curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | s
 ```
 
 > [!IMPORTANT]
-> Add inbound rules in your security group to allow ports `80` and `8388` (or the port specified by the `-p` flag or the `SS_PORT` environment variable).
+> Add inbound rules in the security group to allow ports `80` and `8388` (or the port specified by the `-p` flag or the `SS_PORT` environment variable).
 
 Once completed, you can:
 
-- Access `http://<server-ip>` to verify network access (should return `Hello World!`)
-- Use the displayed `ss://` URI or QR code to configure your Shadowsocks client
+- Run `curl http://<server-ip>` to check network connectivity (should return `Hello World!`)
+- Use the displayed `ss://` URI or QR code to configure the Shadowsocks client
 
 ## ⚙️ Custom Options
 
@@ -77,7 +77,7 @@ sudo bash deploy.sh \
 
 The script installs a lightweight HTTP server (using `ncat`) that listens on port `80`.
 
-You can verify that your server is accessible from the public internet:
+You can check if the server is reachable from the local machine:
 
 ```bash
 curl http://<server-ip>
