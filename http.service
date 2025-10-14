@@ -32,18 +32,12 @@ Environment=PORT=80
 ExecStartPre=/usr/bin/test -x /bin/bash
 ExecStartPre=/bin/bash -lc 'command -v nc >/dev/null'
 
-# ExecStart: inline bash loop that:
-#  1) prints an HTTP response (CRLFs required),
-#  2) pipes it to nc listening on $PORT,
-#  3) tries two common nc invocation styles for better compatibility.
-# Use printf '%b' so backslash escapes are interpreted portably.
+# ExecStart: inline bash loop that.
 # We do not swallow stderr here so failures are visible in the journal.
 ExecStart=/bin/bash -c '\
   while true; do \
-    printf "%b" "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\nHello World!" \
-      | nc -l -p "$PORT" || \
-    printf "%b" "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\nHello World!" \
-      | nc -l "$PORT" ; \
+    echo -ne "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\nHello World!" \
+      | nc -l "$PORT"; \
   done'
 
 # Behavior on stop / restart
