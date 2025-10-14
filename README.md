@@ -80,4 +80,5 @@ This helps diagnose network connectivity, firewall rules, and NAT/port forwardin
 - Linux with systemd (Ubuntu, Debian, CentOS, etc.)
 - `curl` for downloading files
 - `nc` ([ncat](https://nmap.org/ncat/)) for the health check server
+- Open port `80` in your security group, and the port specified when running the script with the `-p` flag or the `SS_PORT` environment variable
 - qrencode (optional, for displaying QR codes)
