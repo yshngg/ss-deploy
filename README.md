@@ -16,16 +16,13 @@ It supports major Linux distributions including Ubuntu, Debian, CentOS, and more
 
 ## 🚀 Quick Start
 
-### Prerequisite - install `nc` ([ncat](https://nmap.org/ncat/)):
+### Prerequisite - install `nc` ([ncat](https://nmap.org/ncat/)) if it does not exist on your system:
 
 > Ncat is integrated with Nmap.
 
 ```bash
 # RPM-based Distributions (Red Hat, Mandrake, SUSE, Fedora)
 sudo dnf install nmap
-
-# Debian Linux and Derivatives such as Ubuntu
-sudo apt install nmap
 ```
 
 ### Download and run the script in one line:
