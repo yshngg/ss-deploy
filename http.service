@@ -32,7 +32,7 @@ Environment=PORT=80
 ExecStartPre=/usr/bin/test -x /bin/bash
 ExecStartPre=/bin/bash -lc 'command -v nc >/dev/null'
 
-# ExecStart: inline bash loop that.
+# ExecStart: inline bash loop that serves HTTP responses.
 # We do not swallow stderr here so failures are visible in the journal.
 ExecStart=/bin/bash -c '\
   while true; do \
