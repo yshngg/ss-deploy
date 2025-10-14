@@ -28,7 +28,7 @@ curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | s
 Once completed, you can:
 
 - Access `http://<server-ip>` to verify network access (should return `Hello World!`)
-- Use the displayed ss:// URI or QR code to configure your Shadowsocks client
+- Use the displayed `ss://` URI or QR code to configure your Shadowsocks client
 
 ## ⚙️ Custom Options
 
@@ -66,7 +66,7 @@ sudo bash deploy.sh \
 
 ## ✅ Health Check
 
-The script installs a lightweight HTTP server (using ncat) that listens on port 80.
+The script installs a lightweight HTTP server (using `ncat`) that listens on port `80`.
 
 You can verify that your server is accessible from the public internet:
 
