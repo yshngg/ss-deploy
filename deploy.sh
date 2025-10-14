@@ -124,9 +124,9 @@ URL="https://github.com/shadowsocks/shadowsocks-rust/releases/download/${VERSION
 TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
 trap 'cleanup' EXIT
-curl -L "$URL" -o "$TMP_DIR/ss-rust.tar.xz"
+curl -L "$URL" -o "$TMP_DIR/shadowsocks-rust.tar.xz"
 
-tar -xJf "$TMP_DIR/ss-rust.tar.xz" -C "$TMP_DIR"
+tar -xJf "$TMP_DIR/shadowsocks-rust.tar.xz" -C "$TMP_DIR"
 if [[ ! -x "$TMP_DIR/ssserver" || ! -x "$TMP_DIR/ssservice" ]]; then
     echo "❌ Expected binaries not found in $TMP_DIR/" >&2
     exit 1
