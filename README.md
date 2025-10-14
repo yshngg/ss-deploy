@@ -70,7 +70,7 @@ You can verify that your server is accessible from the public internet:
 ```bash
 curl http://<server-ip>
 # should return:
-# pong
+# Hello World!
 ```
 
 This helps diagnose network connectivity, firewall rules, and NAT/port forwarding.
