@@ -7,7 +7,7 @@ It supports major Linux distributions including Ubuntu, Debian, CentOS, and more
 
 ### Demo
 
-[![asciicast](https://asciinema.org/a/kgwE3lxAe3tY4BJbNQfgZPuvn.svg)](https://asciinema.org/a/kgwE3lxAe3tY4BJbNQfgZPuvn)
+[![asciicast](https://asciinema.org/a/92gtGgJnTnFEwgAQd3PIsKxAA.svg)](https://asciinema.org/a/92gtGgJnTnFEwgAQd3PIsKxAA)
 
 ### Supported
 
