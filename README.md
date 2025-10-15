@@ -1,7 +1,28 @@
 # ss-deploy
 
+## Introduction
+
 **ss-deploy** is a simple one-click deployment script for [shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust).  
 It supports major Linux distributions including Ubuntu, Debian, CentOS, and more.
+
+### Demo
+
+[![asciicast](https://asciinema.org/a/kgwE3lxAe3tY4BJbNQfgZPuvn.svg)](https://asciinema.org/a/kgwE3lxAe3tY4BJbNQfgZPuvn)
+
+### Supported
+
+#### Linux Distributions:
+
+- [x] Amazon Linux 2023
+- [x] Red Hat Enterprise Linux (RHEL)
+- [x] SUSE Linux Enterprise Server (SLES)
+- [x] Ubuntu Server
+- [x] Debian Server
+
+#### Architecture
+
+- [x] x86_64 / AMD64
+- [x] ARM64 / AArch64
 
 ## 🧩 Features
 
