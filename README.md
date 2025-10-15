@@ -43,7 +43,10 @@ It supports major Linux distributions including Ubuntu, Debian, CentOS, and more
 
 ```bash
 # RPM-based Distributions (Red Hat, Mandrake, SUSE, Fedora)
-sudo dnf install nmap
+sudo dnf update -y && sudo dnf install -y nmap
+
+# Debian Linux and Derivatives such as Ubuntu
+sudo apt update && sudo apt install -y nmap
 ```
 
 ### Download and run the script in one line:
