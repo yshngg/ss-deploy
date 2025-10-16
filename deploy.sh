@@ -15,7 +15,7 @@ VERSION="${SS_VERSION:-latest}"
 CONFIG_DIR="/etc/shadowsocks-rust"
 CONFIG_FILE="${CONFIG_DIR}/config.json"
 BIN_DIR="/usr/local/bin"
-SCRIPT_DIR="$(pwd)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 # Fix "command not found" error on certain Linux distributions (e.g., Red Hat)
 # https://superuser.com/a/709522
