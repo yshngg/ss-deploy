@@ -1,0 +1,13 @@
+[Unit]
+Description=Shadowsocks Local Client
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/sslocal --server-url <ss-link> --local-addr 127.0.0.1:1080
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
