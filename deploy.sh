@@ -53,51 +53,9 @@ done
 
 echo "🚀 Starting Shadowsocks-Rust deployment..."
 
-# 0. Create shadowsocks user and group if not exist
-sudo getent group shadowsocks >/dev/null || sudo groupadd --system shadowsocks
-sudo id -u shadowsocks >/dev/null 2>&1 || sudo useradd --system --no-create-home --shell /usr/sbin/nologin --gid shadowsocks shadowsocks
-
 # 1. Setting up HTTP Server
 echo "📡 Setting up HTTP Server for checking network connectivity..."
-cat <<'EOF' > "$SCRIPT_DIR/http.service"
-[Unit]
-Description=Minimal HTTP server (netcat, inline command)
-Documentation=man:nc(1)
-After=network.target
-Wants=network-online.target
-StartLimitIntervalSec=60
-StartLimitBurst=5
-
-[Service]
-Type=simple
-Environment=PORT=80
-ExecStartPre=/usr/bin/test -x /bin/bash
-ExecStartPre=/bin/bash -lc 'command -v nc >/dev/null'
-ExecStart=/bin/bash -c '\
-  while true; do \
-    echo -ne "HTTP/1.1 200 OK\r\nContent-Length: 12\r\nContent-Type: text/plain; charset=utf-8\r\nConnection: close\r\n\r\nHello World!" \
-      | nc -l "$PORT"; \
-  done'
-Restart=on-failure        # restart only on non-zero exit (avoid tight always-restart loops)
-RestartSec=5s
-TimeoutStopSec=10s
-KillMode=control-group    # ensure child processes are killed on stop
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=pong-nc
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-NoNewPrivileges=true
-ProtectSystem=full            # make /usr and /boot read-only for the service
-ProtectHome=true              # hide /home and /root
-PrivateTmp=true               # give the service its own /tmp
-PrivateDevices=true           # deny access to raw devices
-MemoryDenyWriteExecute=true   # disallow writable+executable mappings
-LimitNOFILE=8192
-
-[Install]
-WantedBy=multi-user.target
-EOF
+curl --output "$SCRIPT_DIR/http.service" https://raw.githubusercontent.com/yshngg/ss-deploy/main/http.service
 sudo install -m 644 "$SCRIPT_DIR/http.service" /etc/systemd/system/http.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now http.service
@@ -159,45 +117,7 @@ cat <<EOF | sudo tee "$CONFIG_FILE" >/dev/null
 EOF
 
 # 4. Run ssserver
-cat <<'EOF' > $SCRIPT_DIR/ssserver.service
-[Unit]
-Description=Shadowsocks-Rust Server
-Documentation=https://github.com/shadowsocks/shadowsocks-rust
-After=network.target
-Wants=network-online.target
-StartLimitIntervalSec=60
-StartLimitBurst=5
-
-[Service]
-Type=simple
-User=shadowsocks
-Group=shadowsocks
-RuntimeDirectory=shadowsocks-rust
-RuntimeDirectoryMode=0750
-ExecStartPre=/usr/bin/test -f /etc/shadowsocks-rust/config.json
-ExecStart=/usr/local/bin/ssserver -c /etc/shadowsocks-rust/config.json
-TimeoutStopSec=20
-Restart=on-failure
-RestartSec=5s
-KillMode=control-group
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=shadowsocks-rust
-LimitNOFILE=65536
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-AmbientCapabilities=CAP_NET_BIND_SERVICE
-NoNewPrivileges=true
-ProtectSystem=full        # make /usr and /boot read-only (but allow /etc and /var)
-ProtectHome=true         # make /home, /root, /run/user inaccessible
-ReadOnlyPaths=/usr/local/bin
-ReadWritePaths=/var/run/shadowsocks-rust /etc/shadowsocks-rust
-PrivateTmp=true
-PrivateDevices=true
-MemoryDenyWriteExecute=true
-
-[Install]
-WantedBy=multi-user.target
-EOF
+curl --output "$SCRIPT_DIR/ssserver.service" https://raw.githubusercontent.com/yshngg/ss-deploy/main/ssserver.service
 sudo install -m 644 "$SCRIPT_DIR/ssserver.service" /etc/systemd/system/ssserver.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now ssserver.service

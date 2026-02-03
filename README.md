@@ -52,15 +52,15 @@ sudo apt update && sudo apt install -y nmap
 ### Download and run the script in one line:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | bash
 ```
 
 > [!IMPORTANT]
-> Add inbound rules in the security group to allow ports `80` and `8388` (or the port specified by the `-p` flag or the `SS_PORT` environment variable).
+> Add inbound rules in the security group to allow ports `8080` and `8388` (or the port specified by the `-p` flag or the `SS_PORT` environment variable).
 
 Once completed, you can:
 
-- Run `curl http://<server-ip>` to check network connectivity (should return `Hello World!`)
+- Run `curl http://<server-ip>:8080` to check network connectivity (should return `Hello World!`)
 - Use the displayed `ss://` URI or QR code to configure the Shadowsocks client
 
 ## ⚙️ Custom Options
@@ -74,13 +74,13 @@ SS_PORT=443 \
 SS_METHOD=chacha20-ietf-poly1305 \
 SS_PLUGIN=v2ray-plugin \
 SS_PLUGIN_OPTS="server;tls" \
-sudo bash deploy.sh
+./deploy.sh
 ```
 
 ### CLI arguments
 
 ```bash
-sudo bash deploy.sh \
+./deploy.sh \
   -p 443 \
   -m chacha20-ietf-poly1305 \
   -P v2ray-plugin \
@@ -89,13 +89,13 @@ sudo bash deploy.sh \
 
 ### Available Options
 
-| Option              | Description                                 | Default         |
-|---------------------|---------------------------------------------|-----------------|
-| `-p`, `SS_PORT`      | Port to listen                              | `8388`          |
-| `-m`, `SS_METHOD`    | Encryption method                           | `chacha20-ietf-poly1305` |
-| `-a`, `SS_LISTEN_ADDR` | Listen address                            | `0.0.0.0`       |
-| `-P`, `SS_PLUGIN`    | Plugin name (e.g., `v2ray-plugin`)          | *(empty)*       |
-| `-o`, `SS_PLUGIN_OPTS`| Plugin options (e.g., `server;tls`)        | *(empty)*       |
+| Option                 | Description                         | Default                  |
+| ---------------------- | ----------------------------------- | ------------------------ |
+| `-p`, `SS_PORT`        | Port to listen                      | `8388`                   |
+| `-m`, `SS_METHOD`      | Encryption method                   | `chacha20-ietf-poly1305` |
+| `-a`, `SS_LISTEN_ADDR` | Listen address                      | `0.0.0.0`                |
+| `-P`, `SS_PLUGIN`      | Plugin name (e.g., `v2ray-plugin`)  | _(empty)_                |
+| `-o`, `SS_PLUGIN_OPTS` | Plugin options (e.g., `server;tls`) | _(empty)_                |
 
 ## ✅ Health Check
 
