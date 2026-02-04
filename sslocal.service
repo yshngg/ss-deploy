@@ -1,0 +1,21 @@
+[Unit]
+Description=Shadowsocks Local Client
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+DynamicUser=true
+
+# Pre-flight checks: ensure config file exists (fail early if missing).
+ExecStartPre=/usr/bin/test -r /etc/shadowsocks-rust/config.json
+
+# Main process: path to the shadowsocks-rust binary and config file.
+ExecStart=/usr/local/bin/sslocal --config /etc/shadowsocks-rust/config.json
+
+# https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Restart=
+Restart=on-failure
+
+[Install]
+Alias=sslocal.service
+WantedBy=multi-user.target
