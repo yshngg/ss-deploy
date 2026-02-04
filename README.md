@@ -55,6 +55,12 @@ sudo apt update && sudo apt install -y nmap
 curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | bash
 ```
 
+If you aren't root user, please run:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yshngg/ss-deploy/main/deploy.sh | sudo bash
+```
+
 > [!IMPORTANT]
 > Add inbound rules in the security group to allow ports `8080` and `8388` (or the port specified by the `-p` flag or the `SS_PORT` environment variable).
 

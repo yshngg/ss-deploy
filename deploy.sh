@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Check root privileges
+if ! [ $(id -u) = 0 ]; then
+    echo "Please run script with sudo"
+    exit 1
+fi
+
 IFS=$'\n\t'
 
 # Enable debug tracing and error line tracking
