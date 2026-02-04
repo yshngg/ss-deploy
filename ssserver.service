@@ -12,7 +12,7 @@ DynamicUser=true
 ExecStartPre=/usr/bin/test -f /etc/shadowsocks-rust/config.json
 
 # Main process: path to the shadowsocks-rust binary and config file.
-ExecStart=/usr/local/bin/ssserver -c /etc/shadowsocks-rust/config.json
+ExecStart=/usr/local/bin/ssserver --config /etc/shadowsocks-rust/config.json
 
 # https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html#Restart=
 Restart=on-failure
