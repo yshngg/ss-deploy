@@ -1,8 +1,8 @@
-# ss-deploy
+# Shadowsocks Deploy Script
 
 ## Introduction
 
-**ss-deploy** is a simple one-click deployment script for [shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust).  
+**This** is a simple one-click deployment script for [shadowsocks-rust](https://github.com/shadowsocks/shadowsocks-rust).  
 It supports major Linux distributions including Ubuntu, Debian, CentOS, and more.
 
 ### Demo
@@ -110,7 +110,7 @@ The script installs a lightweight HTTP server (using `ncat`) that listens on por
 You can check if the server is reachable from the local machine:
 
 ```bash
-curl http://<server-ip>
+curl http://<server-ip>:8080
 # should return:
 # Hello World!
 ```
