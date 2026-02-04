@@ -8,7 +8,7 @@ Type=exec
 DynamicUser=true
 
 # Pre-flight checks: ensure config file exists (fail early if missing).
-ExecStartPre=/usr/bin/test -f /etc/shadowsocks-rust/config.json
+ExecStartPre=/usr/bin/test -r /etc/shadowsocks-rust/config.json
 
 # Main process: path to the shadowsocks-rust binary and config file.
 ExecStart=/usr/local/bin/sslocal --config /etc/shadowsocks-rust/config.json
